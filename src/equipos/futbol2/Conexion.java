@@ -29,7 +29,11 @@ public class Conexion extends javax.swing.JFrame {
         this.setContentPane(ima);
          try{
            //1. CREAR OBJETO CONNECTION 
-            miCon = DriverManager.getConnection("jdbc:postgresql://192.168.100.11:5432/EQUIPO","jesux28","2812ale");
+            miCon = DriverManager.getConnection(
+                     "jdbc:mysql://aws-sa-east-1.connect.psdb.cloud/equipo",
+                     "myik06uzx9r09u45fd1g",
+                     "pscale_pw_PqBgeSjM5uh0q1ucCXYPtOZZigTi2VoK4sNRDK3SRPG");
+
          }catch(Exception e){
            System.out.println(e.toString());
          }
@@ -97,7 +101,7 @@ public class Conexion extends javax.swing.JFrame {
          Statement miStatement = miCon.createStatement();
          //3. EJECUTAR SQL// Nos devuelve el resultado de la Consulta
          
-         String consulta = "SELECT  id_equipo, nombre_equipo FROM EQUIPOFUTBOL;";
+         String consulta = "SELECT  id_equipo, nombre_equipo FROM EQUIPO_FUTBOL;";
          ResultSet miResultSet = miStatement.executeQuery(consulta);
                //4. RECORRER EL RESULT SET, el RS es una tabla en memoria Virtual
          
