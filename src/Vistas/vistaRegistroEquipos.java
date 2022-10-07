@@ -5,6 +5,19 @@
  */
 package Vistas;
 
+import equipos.futbol2.Conexionn;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Usuario
@@ -31,9 +44,9 @@ public class vistaRegistroEquipos extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jFrame2 = new javax.swing.JFrame();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txtNombreEquipo = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        txtValorEquipo = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
@@ -74,25 +87,30 @@ public class vistaRegistroEquipos extends javax.swing.JFrame {
         jLabel1.setText("Nombre de Equipo:");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 200, 20));
 
-        jTextField1.setBackground(new java.awt.Color(204, 255, 204));
-        getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 90, 280, 20));
+        txtNombreEquipo.setBackground(new java.awt.Color(204, 255, 204));
+        getContentPane().add(txtNombreEquipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 90, 280, 20));
 
         jLabel3.setFont(new java.awt.Font("Verdana Pro Semibold", 3, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(204, 204, 255));
         jLabel3.setText("Valor:");
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, -1, -1));
 
-        jTextField2.setBackground(new java.awt.Color(204, 255, 204));
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        txtValorEquipo.setBackground(new java.awt.Color(204, 255, 204));
+        txtValorEquipo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                txtValorEquipoActionPerformed(evt);
             }
         });
-        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 170, 60, 20));
+        getContentPane().add(txtValorEquipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 170, 60, 20));
 
         jButton2.setBackground(new java.awt.Color(255, 102, 102));
         jButton2.setFont(new java.awt.Font("Verdana Pro Semibold", 1, 14)); // NOI18N
         jButton2.setText("GUARDAR");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
         getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 250, -1, -1));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Vistas/cancha futbol (2).png"))); // NOI18N
@@ -105,10 +123,74 @@ public class vistaRegistroEquipos extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void txtValorEquipoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtValorEquipoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_txtValorEquipoActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        //Equipo equipo = new Equipo();
+        
+        //EquipoController equipoController = new EquipoController();
+        
+        String nomEquipo =  txtNombreEquipo.getText();
+        int valorEquipo = Integer.parseInt(txtValorEquipo.getText());
+        
+        Conexionn cc=new Conexionn();
+        Connection cn = null;
+        try {
+            cn = cc.getConexion();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(vistaRegistroEquipos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try{
+            if(existe(nomEquipo)){
+                JOptionPane.showMessageDialog(null,"EL EQUIPO YA EXISTE!!!");
+            }else{  
+    
+                PreparedStatement pst=cn.prepareStatement("INSERT INTO EQUIPO_FUTBOL(NOMBRE_EQUIPO,VALOR_EQUIPO) VALUES(?,?)");
+                pst.setString(1,nomEquipo);
+                pst.setInt(2,valorEquipo);
+                int a=pst.executeUpdate();
+                if(a>0){
+                    JOptionPane.showMessageDialog(null,"Registro exitoso");
+                    limpiar();
+                }
+                else{
+                         JOptionPane.showMessageDialog(null,"Error al agregar");
+                    }
+            }
+        }      
+            catch(Exception e){
+       }
+            
+            
+
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
+    private boolean existe(String nombre_equipo) throws SQLException, ClassNotFoundException{
+        PreparedStatement ps = null;
+        Conexionn cc=new Conexionn();
+        Connection cn = null;
+        cn = cc.getConexion();
+        //Connection con = getConexion();
+        ResultSet rs;
+        String sql = "SELECT NOMBRE_EQUIPO FROM EQUIPO_FUTBOL WHERE NOMBRE_EQUIPO = ?";
+
+        ps = cn.prepareStatement(sql);
+        ps.setString(1, nombre_equipo);
+        rs = ps.executeQuery();
+        
+        if(rs.next()){
+            return true;
+
+        }else
+            return false;
+    }
+    private void limpiar(){
+        txtNombreEquipo.setText("");
+        txtValorEquipo.setText("");
+    }
     /**
      * @param args the command line arguments
      */
@@ -152,7 +234,7 @@ public class vistaRegistroEquipos extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField txtNombreEquipo;
+    private javax.swing.JTextField txtValorEquipo;
     // End of variables declaration//GEN-END:variables
 }
